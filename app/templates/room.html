@@ -42,7 +42,24 @@
     const message = document.getElementById("message");
     if (message.value == "") return;
     socketio.emit("message", { data: message.value });
-    message.value = "";
+    var data = { "message": message.value };
+    
+    //THIS POSTS THE DATA TO ROOM/MESSAGES
+    fetch('/room/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Do something with the response if needed
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
   };
 </script>
 {% for msg in messages %}

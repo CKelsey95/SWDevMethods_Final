@@ -61,6 +61,7 @@ def home():
 
     return render_template("home.html")
 
+
 @app.route("/room")
 def room():
     room = session.get("room")
@@ -111,6 +112,16 @@ def disconnect():
     
     send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} has left the room {room}")
+
+@app.route("/room/messages", methods = ["POST"])
+def test():
+    if request.method == "POST":
+        data = request.json
+        #DATA IS THE MESSAGE DATA
+        #NEED TO GENERATE ID AND ATTACH USER INFO TO MESSAGE PUSH TO DB
+        print(data)
+    result = {'Success': True}
+    return result, 201
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
