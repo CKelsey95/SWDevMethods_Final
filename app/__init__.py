@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from flask_socketio import join_room, leave_room, send, SocketIO
 from pymongo import MongoClient
 from pymongo.mongo_client import MongoClient
@@ -113,15 +113,33 @@ def disconnect():
     send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} has left the room {room}")
 
-@app.route("/room/messages", methods = ["POST"])
-def test():
+@app.route("/room/messages", methods=["POST"])
+def store_message():
     if request.method == "POST":
         data = request.json
-        #DATA IS THE MESSAGE DATA
-        #NEED TO GENERATE ID AND ATTACH USER INFO TO MESSAGE PUSH TO DB
-        print(data)
-    result = {'Success': True}
-    return result, 201
+        room = session.get("room")
+        name = session.get("name")
+
+        if not room or not name:
+            return jsonify({'error': 'User or room not found.'}), 400
+
+        message = {
+            "user": name,
+            "content": data.get("message"),
+            "room": room
+        }
+
+        try:
+            db = client.chats  # Assume 'chats' is the name of your database
+            messages_collection = db.messages  # Assume 'messages' is the name of your collection
+            result = messages_collection.insert_one(message)
+            print(f"Message inserted with id: {result.inserted_id}")
+            return jsonify({'Success': True}), 201
+        except Exception as e:
+            print(f"Error inserting message: {e}")
+            return jsonify({'error': 'Error inserting message.'}), 500
+
+    return jsonify({'error': 'Invalid request method.'}), 405
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
