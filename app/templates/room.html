@@ -1,68 +1,56 @@
+<!--Room template, Posts data to /room/messages endpoint-->
+
 {% extends 'base.html' %} {% block content %}
+
 <div class="message-box">
-  <h2>Chat Room: {{code}}</h2>
-  <div class="messages" id="messages"></div>
-  <div class="inputs">
-    <input
-      type="text"
-      rows="3"
-      placeholder="Message"
-      name="message"
-      id="message"
-    />
-    <button type="button" name="send" id="send-btn" onClick="sendMessage()">
-      Send
-    </button>
-  </div>
+    <h2>Chat Room: {{code}}</h2>
+    <div class="messages" id="messages"></div>
+    <div class="inputs">
+        <input
+            type="text"
+            rows="3"
+            placeholder="Message"
+            name="message"
+            id="message"
+        />
+        <button type="button" name="send" id="send-btn" onClick="sendMessage()">
+            Send
+        </button>
+    </div>
 </div>
 <script type="text/javascript">
-  var socketio = io();
+    var socketio = io();
 
-  const messages = document.getElementById("messages");
-  const createMessage = (name, msg) => {
-    const content = `
+    const messages = document.getElementById("messages");
+    const createMessage = (name, msg) => {
+        const content = `
     <div class="text">
         <span>
             <strong>${name}</strong>: ${msg}
         </span>
         <span class="muted">
+
             ${new Date().toLocaleString()}
         </span>
     </div>
     `;
-    messages.innerHTML += content;
-  };
+        messages.innerHTML += content;
+    };
 
-  socketio.on("message", (data) => {
-    createMessage(data.name, data.message);
-  });
+    socketio.on("message", (data) => {
+        createMessage(data.name, data.message);
+    });
 
-  const sendMessage = () => {
-    const message = document.getElementById("message");
-    if (message.value == "") return;
-    socketio.emit("message", { data: message.value });
-    var data = { "message": message.value };
-    
-    //THIS POSTS THE DATA TO ROOM/MESSAGES
-    fetch('/room/messages', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                // Do something with the response if needed
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-  };
+    const sendMessage = () => {
+        const message = document.getElementById("message");
+        if (message.value == "") return;
+        socketio.emit("message", { data: message.value });
+        var data = { message: message.value };
+    };
 </script>
 {% for msg in messages %}
 <script type="text/javascript">
-  createMessage("{{msg.name}}", "{{msg.message}}");
+    // TODO PASS MESSAGE INFO FROM DB
+    createMessage("{{msg.name}}", "{{msg.message}}");
 </script>
 {% endfor %} {% endblock %}

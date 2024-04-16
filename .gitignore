@@ -1,5 +1,6 @@
-.env
+/.venv
 /__pycache__
 /app/__pycache__
 /myenv
 /venv
+.pyrightconfig.json
