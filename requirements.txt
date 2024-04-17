@@ -9,3 +9,4 @@ pymongo==4.6.2
 python-dotenv==1.0.1
 Werkzeug==3.0.1
 Flask-SocketIO
+pytest

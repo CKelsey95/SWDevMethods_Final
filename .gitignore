@@ -4,3 +4,4 @@
 /myenv
 /venv
 .pyrightconfig.json
+/.env
