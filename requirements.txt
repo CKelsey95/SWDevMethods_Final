@@ -10,4 +10,4 @@ python-dotenv==1.0.1
 Werkzeug==3.0.1
 Flask-SocketIO
 gunicorn==22.0.0
-geventwebsocket
+gevent-websocket
