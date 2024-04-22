@@ -1,38 +1,27 @@
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from flask_socketio import join_room, leave_room, send, SocketIO
-from pymongo import MongoClient
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
-import os
 import random
 from string import ascii_uppercase
 
-load_dotenv()
-MONGOAPIKEY = os.getenv('MONGO_DB_API_KEY')
-
-uri = MONGOAPIKEY
-
-# Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
-
+# Initialize Flask
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
 
 rooms = {}
 
+# TODO GENERATE CODE ONLY IF CODE NOT IN DB
 def generate_unique_code(length):
     while True:
         code = ""
         for _ in range(length):
             code += random.choice(ascii_uppercase)
-        
         if code not in rooms:
             break
-    
     return code
 
+# ROUTES
 @app.route("/", methods=["POST", "GET"])
 def home():
     session.clear()
@@ -47,20 +36,20 @@ def home():
 
         if join != False and not code:
             return render_template("home.html", error="Please enter a room code.", code=code, name=name)
-        
+
         room = code
         if create != False:
+            # TODO CHECK IF UNIQUE CODE DB REQUEST
             room = generate_unique_code(4)
             rooms[room] = {"members": 0, "messages": []}
         elif code not in rooms:
             return render_template("home.html", error="Room does not exist.", code=code, name=name)
-        
+
         session["room"] = room
         session["name"] = name
         return redirect(url_for("room"))
 
     return render_template("home.html")
-
 
 @app.route("/room")
 def room():
@@ -74,8 +63,8 @@ def room():
 def message(data):
     room = session.get("room")
     if room not in rooms:
-        return 
-    
+        return
+
     content = {
         "name": session.get("name"),
         "message": data["data"]
@@ -93,7 +82,7 @@ def connect(auth):
     if room not in rooms:
         leave_room(room)
         return
-    
+
     join_room(room)
     send({"name": name, "message": "has entered the room"}, to=room)
     rooms[room]["members"] += 1
@@ -109,37 +98,9 @@ def disconnect():
         rooms[room]["members"] -= 1
         if rooms[room]["members"] <= 0:
             del rooms[room]
-    
+
     send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} has left the room {room}")
-
-@app.route("/room/messages", methods=["POST"])
-def store_message():
-    if request.method == "POST":
-        data = request.json
-        room = session.get("room")
-        name = session.get("name")
-
-        if not room or not name:
-            return jsonify({'error': 'User or room not found.'}), 400
-
-        message = {
-            "user": name,
-            "content": data.get("message"),
-            "room": room
-        }
-
-        try:
-            db = client.chats  # Assume 'chats' is the name of your database
-            messages_collection = db.messages  # Assume 'messages' is the name of your collection
-            result = messages_collection.insert_one(message)
-            print(f"Message inserted with id: {result.inserted_id}")
-            return jsonify({'Success': True}), 201
-        except Exception as e:
-            print(f"Error inserting message: {e}")
-            return jsonify({'error': 'Error inserting message.'}), 500
-
-    return jsonify({'error': 'Invalid request method.'}), 405
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

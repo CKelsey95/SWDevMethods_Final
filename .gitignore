@@ -1,6 +1,7 @@
-.env
+/.venv
 /__pycache__
 /app/__pycache__
 /myenv
-/.venv
-/.pytest_cache
+/venv
+.pyrightconfig.json
+/.env
