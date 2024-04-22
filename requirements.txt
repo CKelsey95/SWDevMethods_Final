@@ -20,4 +20,8 @@ python-socketio==5.11.2
 simple-websocket==1.0.0
 tomli==2.0.1
 Werkzeug==3.0.1
+Flask-SocketIO
+gunicorn==22.0.0
+gevent-websocket
+
 wsproto==1.2.0
