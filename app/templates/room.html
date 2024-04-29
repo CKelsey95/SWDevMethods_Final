@@ -54,6 +54,12 @@
         var data = { message: message.value };
         message.value = "";
     };
+    // Event listener for Enter key press
+    document.getElementById("message").addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
 </script>
 {% for msg in messages %}
 <script type="text/javascript">
