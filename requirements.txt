@@ -23,5 +23,4 @@ Werkzeug==3.0.1
 Flask-SocketIO
 gunicorn==22.0.0
 gevent-websocket
-
 wsproto==1.2.0
