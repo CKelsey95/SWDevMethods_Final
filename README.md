@@ -91,8 +91,8 @@ flask --debug run
 
 The Chat App was designed and developed by the following individuals:
 
-- Colton Kelsey
 - Mohamed Noor
+- Colton Kelsey
 - Edwin Savelson
 
 **Enjoy using the Chat App and have a great experience!**
